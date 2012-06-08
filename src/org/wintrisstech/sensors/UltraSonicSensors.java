@@ -55,24 +55,11 @@ public class UltraSonicSensors
      */
     public void readUltrasonicSensors() throws ConnectionLostException, InterruptedException
     {
-        float leftAccumulated = 0.0F;
-        float frontAccumulated = 0.0F;
-        float rightAccumulated = 0.0F;
         strobe.write(true);
-        for (int n = 0; n < NUM_SAMPLES; n++)
-        {
-            SystemClock.sleep(200);
-            leftAccumulated += left.getDuration(); // gets duration in seconds
-            frontAccumulated += front.getDuration();
-            rightAccumulated += right.getDuration();
-        }
-        synchronized (this)
-        {
-            leftDistance = Math.round(leftAccumulated * CONVERSION_FACTOR / NUM_SAMPLES);
-            frontDistance = Math.round(frontAccumulated * CONVERSION_FACTOR / NUM_SAMPLES);
-            rightDistance = Math.round(rightAccumulated * CONVERSION_FACTOR / NUM_SAMPLES);
-        }
         strobe.write(false);
+        leftDistance = (int) (left.getDuration() *1000000);    
+        frontDistance = (int) (front.getDuration() * 1000000);    
+        rightDistance = (int) (right.getDuration() * 1000000);    
     }
 
     /**

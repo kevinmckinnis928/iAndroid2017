@@ -35,10 +35,8 @@ public class Dashboard extends IOIOActivity implements TextToSpeech.OnInitListen
      * Text view that contains all logged messages
      */
     private LogTextView mText;
-    /**
-     * A Lada instance
-     */
-    private Lada kalina;
+    
+    private Commander commander;
     /**
      * TTS stuff
      */
@@ -70,12 +68,12 @@ public class Dashboard extends IOIOActivity implements TextToSpeech.OnInitListen
     @Override
     public void onPause()
     {
-        if (kalina != null)
+        if (commander != null)
         {
             log("Pausing");
             try
             {
-                kalina.stop();
+                commander.stop();
             } catch (ConnectionLostException ex)
             {
                 //Nothing much we can do. Let's hope that kalina is not moving!
@@ -143,13 +141,13 @@ public class Dashboard extends IOIOActivity implements TextToSpeech.OnInitListen
                  * needed to establish connections to other peripherals, such as
                  * sensors that are not part of the iRobot Create.
                  */
-                kalina = new Lada(ioio, iRobotCreate, Dashboard.this);
-                kalina.initialize();
+                commander = new Commander(ioio, iRobotCreate, Dashboard.this);
+                commander.initialize();
             }
 
             public void loop() throws ConnectionLostException, InterruptedException
             {
-                kalina.loop();
+                commander.loop();
             }
 
             public void disconnected()
