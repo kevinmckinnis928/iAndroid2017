@@ -45,9 +45,9 @@ public class Commander extends IRobotCreateAdapter {
             dashboard.log("Left Sonar" + sonar.getLeftDistance());// reads the distance from left wall
             dashboard.log("Front Sonar" + sonar.getFrontDistance());// reads the distance from the front wall
             dashboard.log("Right Sonar" + sonar.getRightDistance());// reads the distance from the right wall
-            dashboard.log("_______________________________________");
+            dashboard.log("--------------------------------------");
             //scenario 1
-            if (sonar.getLeftDistance() <= 950 && sonar.getRightDistance() <= 900) {
+            if (sonar.getLeftDistance() <= 950 && sonar.getRightDistance() <= 900 && sonar.getFrontDistance() >= 850) {
                 driveDirect(100, 100);
                 getDistance();
             }
