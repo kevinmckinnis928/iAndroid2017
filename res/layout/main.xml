@@ -14,13 +14,17 @@
         android:textSize="24sp"
         android:textStyle="bold">
     </TextView>
-        
-    <org.wintrisstech.erik.iaroc.LogTextView
-        android:id="@+id/text"
-        android:background="@drawable/box"
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:scrollbars="vertical"/>
+    
+    <ScrollView android:id="@+id/scroller"
+                android:layout_width="fill_parent" 
+                android:layout_height="fill_parent"
+                android:background="@drawable/box">
+        <TextView android:id="@+id/text"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:paddingBottom="8dip" 
+                  android:layout_weight="1" />
+    </ScrollView>
+
     
 </LinearLayout>

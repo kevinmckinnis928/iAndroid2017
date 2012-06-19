@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOActivity;
 import java.util.Locale;
 import org.wintrisstech.irobot.ioio.IRobotCreateInterface;
+import org.wintrisstech.irobot.ioio.R;
 import org.wintrisstech.irobot.ioio.SimpleIRobotCreate;
 
 /**
@@ -19,7 +22,7 @@ import org.wintrisstech.irobot.ioio.SimpleIRobotCreate;
  * iRobot. An instance of the Dashboard class will display the readings of these
  * three sensors.
  *
- * <p> There should be no need to modify this class. Modify Lada instead.
+ * <p> There should be no need to modify this class. Modify Commander instead.
  *
  * @author Erik Colban
  *
@@ -34,8 +37,11 @@ public class Dashboard extends IOIOActivity implements TextToSpeech.OnInitListen
     /**
      * Text view that contains all logged messages
      */
-    private LogTextView mText;
-    
+    private TextView mText;
+    private ScrollView scroller;
+    /**
+     * A Lada instance
+     */
     private Commander commander;
     /**
      * TTS stuff
@@ -60,7 +66,8 @@ public class Dashboard extends IOIOActivity implements TextToSpeech.OnInitListen
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(checkIntent, MY_DATA_CHECK_CODE);
 
-        mText = (LogTextView) findViewById(R.id.text);
+        mText = (TextView) findViewById(R.id.text);
+        scroller = (ScrollView) findViewById(R.id.scroller);
         log(getString(R.string.wait_ioio));
 
     }
@@ -71,13 +78,6 @@ public class Dashboard extends IOIOActivity implements TextToSpeech.OnInitListen
         if (commander != null)
         {
             log("Pausing");
-            try
-            {
-                commander.stop();
-            } catch (ConnectionLostException ex)
-            {
-                //Nothing much we can do. Let's hope that kalina is not moving!
-            }
         }
         super.onPause();
     }
@@ -175,6 +175,7 @@ public class Dashboard extends IOIOActivity implements TextToSpeech.OnInitListen
             {
                 mText.append(msg);
                 mText.append("\n");
+                scroller.smoothScrollTo(0, mText.getBottom()); 
             }
         });
     }

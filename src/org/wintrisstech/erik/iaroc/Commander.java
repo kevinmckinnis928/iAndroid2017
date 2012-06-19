@@ -18,6 +18,8 @@ public class Commander extends IRobotCreateAdapter {
     public static final int LEFT = 0;
     public static final int RIGHT = 1;
     public static final int FORWARD = 2;
+    public static final int speed = 200;
+    public static final int oneBlockDistance = 675;
 
     public Commander(IOIO ioio, IRobotCreateInterface create, Dashboard dashboard) throws ConnectionLostException {
 
@@ -67,40 +69,49 @@ public class Commander extends IRobotCreateAdapter {
     private void scenarios() throws ConnectionLostException {
         //scenario 1
         if (sonar.getLeftDistance() <= 950 && sonar.getRightDistance() <= 900 && sonar.getFrontDistance() >= 850) {
-
+            dashboard.log("scenario 1 ---------------");
             if (getDistance() <= 990) {
-
-                driveDirect(100, 100);
+                driveDistance(speed, oneBlockDistance);
             }
         }
         //scenario 2
         if (sonar.getLeftDistance() <= 950 && sonar.getFrontDistance() <= 850 && sonar.getRightDistance() >= 900) {
+            dashboard.log("scenario 2 ---------------");
             turn(90, RIGHT);
+            driveDistance(speed, oneBlockDistance);
         }
         //scenario 3
         if (sonar.getLeftDistance() >= 950 && sonar.getFrontDistance() <= 850 && sonar.getRightDistance() <= 900) {
+            dashboard.log("scenario 3 ---------------");
             turn(90, LEFT);
+            driveDistance(speed, oneBlockDistance);
         }
         //scenario 4
         if (sonar.getLeftDistance() <= 950 && sonar.getFrontDistance() <= 850 && sonar.getRightDistance() <= 900) {
+            dashboard.log("scenario 4 ---------------");
             turn(180, RIGHT);
+            driveDistance(speed, oneBlockDistance);
         }
         //scenario 5
         if (sonar.getLeftDistance() >= 950 && sonar.getFrontDistance() <= 850 && sonar.getRightDistance() >= 900) {
+            dashboard.log("scenario 5 ---------------");
             scenario5();
         }
 
         //scenario 6
         if (sonar.getLeftDistance() <= 950 && sonar.getFrontDistance() >= 850 && sonar.getRightDistance() >= 900) {
+            dashboard.log("scenario 6 ---------------");
             scenario6();
         }
         //scenario 7
         if (sonar.getLeftDistance() >= 950 && sonar.getFrontDistance() >= 850 && sonar.getRightDistance() <= 900) {
-            // randomly choose whether to go straight or turn 90 degrees left
+            dashboard.log("scenario 7 ---------------");
+            scenario7();
         }
         //scenario 8
         if (sonar.getLeftDistance() >= 950 && sonar.getFrontDistance() >= 850 && sonar.getRightDistance() >= 900) {
-            // randomly choose whether to go straight or turn 90 degrees right or left
+            dashboard.log("scenario 8 ---------------");
+            scenario8();
         }
     }
 
@@ -124,8 +135,7 @@ public class Commander extends IRobotCreateAdapter {
     private void drive(int direction, int leftSpeedUp, int rightSpeedUp) throws ConnectionLostException {
         if (direction == FORWARD) {
             driveDirect(100, 100);
-        } 
-        else if (direction == LEFT) {
+        } else if (direction == LEFT) {
             driveDirect(100, -100);
         } else if (direction == RIGHT) {
             driveDirect(-100, 100);
@@ -133,22 +143,58 @@ public class Commander extends IRobotCreateAdapter {
             throw new RuntimeException("I don't know how to go that way!");
         }
     }
-    private void scenario5() throws ConnectionLostException
-    {
+
+    private void scenario5() throws ConnectionLostException {
         double x = Math.random();
-        if(x <= .5)
-        {
+        if (x <= .5) {
             turn(90, RIGHT);
+            driveDistance(speed, oneBlockDistance);
+        } else {
+            turn(90, LEFT);
+            driveDistance(speed, oneBlockDistance);
         }
-        else turn(90, LEFT);
     }
-    private void scenario6() throws ConnectionLostException
-    {
+
+    private void scenario6() throws ConnectionLostException {
         double x = Math.random();
-        if(x <= .5)
-        {
+        if (x <= .5) {
             turn(90, RIGHT);
+            driveDistance(speed, oneBlockDistance);
+        } else {
+            driveDistance(speed, oneBlockDistance);
         }
-        else drive(FORWARD);
+    }
+
+    private void scenario7() throws ConnectionLostException {
+        double x = Math.random();
+        if (x <= .5) {
+            turn(90, LEFT);
+            driveDistance(speed, oneBlockDistance);
+        } else {
+            driveDistance(speed, oneBlockDistance);
+        }
+    }
+
+    private void scenario8() throws ConnectionLostException {
+        double x = Math.random();
+        if (x <= .33) {
+            turn(90, LEFT);
+            driveDistance(speed, oneBlockDistance);
+        } else if (x <= .67 && x > .33) {
+            turn(90, RIGHT);
+            driveDistance(speed, oneBlockDistance);
+        } else {
+            driveDistance(speed, oneBlockDistance);
+        }
+    }
+
+    private void driveDistance(int speed, int distance) throws ConnectionLostException {
+        int distanceDriven = 0;
+        while (distanceDriven < distance) {
+            readSensors(SENSORS_GROUP_ID2);
+            distanceDriven += getDistance();
+            driveDirect(speed, speed);
+        }
+
     }
 }
