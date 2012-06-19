@@ -10,42 +10,6 @@ package org.wintrisstech.erik.iaroc;
  */
 public class IRSensorUtilities
 {
-    public BeaconCode getBeaconCode(int infraredByte)
-    {
-            if(infraredByte == 255)
-            {
-                return BeaconCode.NO_BEACON_DETECTED;
-            }
-            else if(infraredByte == 248)
-            {
-                return BeaconCode.RED_BUOY;
-            }
-            else if(infraredByte == 244)
-            {
-                return BeaconCode.GREEN_BUOY;
-            }
-            else if(infraredByte == 242)
-            {
-                return BeaconCode.FORCEFIELD;
-            }
-            else if(infraredByte == 252)
-            {
-                return BeaconCode.RED_AND_GREEN_BUOY;
-            }
-            else if(infraredByte == 250)
-            {
-                return BeaconCode.RED_BUOY_AND_FORCEFIELD;
-            }
-            else if(infraredByte == 248)
-            {
-                return BeaconCode.GREEN_BUOY_AND_FORCEFIELD;
-            }
-            else if(infraredByte == 254)
-            {
-                return BeaconCode.RED_AND_GREEN_BUOY_AND_FORCEFIELD;
-            }
-            else throw new IllegalArgumentException("Unknown infrared byte");
-    }
     public BeaconState getBeaconState(int infraredByte)
     {
         BeaconState beaconstate = new BeaconState();

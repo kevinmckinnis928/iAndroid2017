@@ -40,7 +40,7 @@ public class Dashboard extends IOIOActivity implements TextToSpeech.OnInitListen
     private TextView mText;
     private ScrollView scroller;
     /**
-     * A Lada instance
+     * A Commander instance
      */
     private Commander commander;
     /**
