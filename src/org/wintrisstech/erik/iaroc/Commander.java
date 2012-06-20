@@ -20,6 +20,8 @@ public class Commander extends IRobotCreateAdapter {
     public static final int FORWARD = 2;
     public static final int speed = 200;
     public static final int oneBlockDistance = 675;
+    int distance = 0;
+    private boolean done = false;
 
     public Commander(IOIO ioio, IRobotCreateInterface create, Dashboard dashboard) throws ConnectionLostException {
 
@@ -37,6 +39,7 @@ public class Commander extends IRobotCreateAdapter {
         dashboard.log("===========Initialize===========");
         readSensors(SENSORS_GROUP_ID6);//Resets all counters in the Create to 0.
         dashboard.log("Battery Voltage" + getVoltage());//reads the voltage of the Robot
+        dashboard.log("-----------------------------------");
     }
 
     /**
@@ -45,19 +48,55 @@ public class Commander extends IRobotCreateAdapter {
      * @throws ConnectionLostException
      */
     public void loop() throws ConnectionLostException {
-        try {
-            readSensors(SENSORS_GROUP_ID2);
-            sonar.readUltrasonicSensors();
-            dashboard.log("Left Sonar" + sonar.getLeftDistance());// reads the distance from left wall
-            dashboard.log("Front Sonar" + sonar.getFrontDistance());// reads the distance from the front wall
-            dashboard.log("Right Sonar" + sonar.getRightDistance());// reads the distance from the right wall
-            dashboard.log("--------------------------------------");
-            scenarios();
-
+        if (isProgramDone()) {
             SystemClock.sleep(1000);
+            return;
+        }
+        //scenarios();
+        //readPrintUltraSonic();
+        //driveUntilBump();
+        SystemClock.sleep(1000);
+        averageUltraSonic();
+    }
+
+    private void readPrintUltraSonic() {
+        try {
+            sonar.readUltrasonicSensors();
+        } catch (ConnectionLostException ex) {
+            Logger.getLogger(Commander.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
             Logger.getLogger(Commander.class.getName()).log(Level.SEVERE, null, ex);
         }
+        dashboard.log("Left Sonar" +  sonar.getLeftDistance());// reads the distance from left wall
+        dashboard.log("Front Sonar" +  sonar.getFrontDistance());// reads the distance from the front wall
+        dashboard.log("Right Sonar" +  sonar.getRightDistance());// reads the distance from the right wall
+        dashboard.log("--------------------------------------");
+    }
+
+    private void averageUltraSonic() throws ConnectionLostException {
+        
+        int totalFrontReadings = 0;
+        int totalLeftReadings = 0;
+        int totalRightReadings = 0;
+
+        for (int count = 0; count < 10; count++) {
+            try {
+                sonar.readUltrasonicSensors();
+            } catch (InterruptedException ex) {
+                dashboard.log(ex.getMessage());
+            }
+            totalFrontReadings += sonar.getFrontDistance();
+            totalLeftReadings += sonar.getLeftDistance();
+            totalRightReadings += sonar.getRightDistance();
+        }
+
+        int averageFrontReadings = totalFrontReadings / 10;
+        int averageLeftReadings = totalLeftReadings / 10;
+        int averageRightReadings = totalRightReadings / 10;
+        dashboard.log("Front Average" +  averageFrontReadings);
+        dashboard.log("Right Average" +  averageRightReadings);
+        dashboard.log("Left Average" +  averageLeftReadings);
+        dashboard.log("--------------------------------");
     }
 
     public void stop() throws ConnectionLostException {
@@ -191,10 +230,36 @@ public class Commander extends IRobotCreateAdapter {
     private void driveDistance(int speed, int distance) throws ConnectionLostException {
         int distanceDriven = 0;
         while (distanceDriven < distance) {
-            readSensors(SENSORS_GROUP_ID2);
+            readSensors(SENSORS_DISTANCE);
             distanceDriven += getDistance();
             driveDirect(speed, speed);
         }
 
+    }
+
+    private void driveUntilBump() throws ConnectionLostException {
+
+        while (!isBumping()) {
+            driveDirect(100, 100);
+            logDistance();
+        }
+        stop();
+        done = true;
+    }
+
+    private boolean isBumping() throws ConnectionLostException {
+        readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
+        return isBumpLeft() || isBumpRight();
+    }
+
+    private void logDistance() throws ConnectionLostException {
+        readSensors(SENSORS_DISTANCE);
+        distance += getDistance();
+        dashboard.log("Distance" + distance);
+        readPrintUltraSonic();
+    }
+
+    private boolean isProgramDone() {
+        return done;
     }
 }
