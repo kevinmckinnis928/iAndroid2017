@@ -24,10 +24,10 @@ public class Commander extends IRobotCreateAdapter {
     public static final int oneBlockDistance = 675;
     int distance = 0;
     private boolean done = false;
-    private final int RIGHT_WALL_PRESENT_SONAR_VALUE = 1873;
-    private final int FRONT_WALL_PRESENT_SONAR_VALUE = 1850;
-    private final int LEFT_WALL_PRESENT_SONAR_VALUE = 1850;
-    private final int CORRECTION_EQUILIBRIUM = 750;
+    private final int RIGHT_WALL_PRESENT_SONAR_VALUE = 1000;
+    private final int FRONT_WALL_PRESENT_SONAR_VALUE = 1000;
+    private final int LEFT_WALL_PRESENT_SONAR_VALUE = 1000;
+    private final int CORRECTION_EQUILIBRIUM = 836;
 
     public Commander(IOIO ioio, IRobotCreateInterface create, Dashboard dashboard) throws ConnectionLostException {
 
@@ -58,17 +58,17 @@ public class Commander extends IRobotCreateAdapter {
             SystemClock.sleep(1000);
             return;
         }
-        try {
-            //scenarios();
-            //readPrintUltraSonic();
-            //driveUntilBump();
-            driveCorrection();
-            if (isBumping()) {
-                done = true;
-            }
-        } catch (InterruptedException ex) {
-            dashboard.log("InterruptedException Error");
+        //try {
+        //scenarios();
+        readPrintUltraSonic();
+        //driveUntilBump();
+        //driveCorrection();
+        if (isBumping()) {
+            driveDirect(0, 0);
         }
+        //} catch (InterruptedException ex) {
+        //    dashboard.log("InterruptedException Error");
+        //}
         SystemClock.sleep(1000);
     }
 
@@ -257,17 +257,19 @@ public class Commander extends IRobotCreateAdapter {
         int rightSonarValue = sonar.getRightDistance();
         dashboard.log("left sonar value " + leftSonarValue);
         dashboard.log("right sonar value " + rightSonarValue);
+        dashboard.log("---------------------------------------");
 
         if (isLeftWallThere(leftSonarValue) && isRightWallThere(rightSonarValue)) {
 
             dashboard.log("Center the robot using both walls.");
+            dashboard.log("------------------------------------");
 
-            if (leftSonarValue < rightSonarValue) {
+            if (leftSonarValue > rightSonarValue) {
 
                 dashboard.log("Speed up the right wheel.");
                 drive(FORWARD, STANDARD_SPEED, INCREASED_SPEED);
 
-            } else if (leftSonarValue > rightSonarValue) {
+            } else if (leftSonarValue < rightSonarValue) {
 
                 dashboard.log("Speed up the left wheel.");
                 drive(FORWARD, INCREASED_SPEED, STANDARD_SPEED);
@@ -280,6 +282,8 @@ public class Commander extends IRobotCreateAdapter {
         } else if (isLeftWallThere(leftSonarValue)) {
 
             dashboard.log("Center the robot using left wall.");
+            dashboard.log("------------------------------------");
+
 
             if (leftSonarValue < CORRECTION_EQUILIBRIUM) {
 
@@ -295,6 +299,7 @@ public class Commander extends IRobotCreateAdapter {
         } else if (isRightWallThere(rightSonarValue)) {
 
             dashboard.log("Center the robot using the right wall.");
+            dashboard.log("------------------------------------");
 
             if (rightSonarValue < CORRECTION_EQUILIBRIUM) {
 
@@ -309,6 +314,7 @@ public class Commander extends IRobotCreateAdapter {
         } else {
 
             dashboard.log("No data to center the robot.");
+            dashboard.log("------------------------------------");
         }
     }
 
