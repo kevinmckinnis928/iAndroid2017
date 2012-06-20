@@ -11,8 +11,9 @@ import org.wintrisstech.sensors.UltraSonicSensors;
 
 public class Commander extends IRobotCreateAdapter {
 
-    public static final int INCREASED_SPEED = 500;
-    public static final int STANDARD_SPEED = 300;
+    public static final int LEFT_INCREASED_SPEED = 500;
+    public static final int RIGHT_INCREASED_SPEED = 500;
+    public static final int STANDARD_SPEED = 100;
     private static final String TAG = "Lada";
     private final Dashboard dashboard;
     public UltraSonicSensors sonar;
@@ -24,9 +25,9 @@ public class Commander extends IRobotCreateAdapter {
     public static final int oneBlockDistance = 675;
     int distance = 0;
     private boolean done = false;
-    private final int RIGHT_WALL_PRESENT_SONAR_VALUE = 1000;
-    private final int FRONT_WALL_PRESENT_SONAR_VALUE = 1000;
-    private final int LEFT_WALL_PRESENT_SONAR_VALUE = 1000;
+    private final int RIGHT_WALL_PRESENT_SONAR_VALUE = 2000;
+    private final int FRONT_WALL_PRESENT_SONAR_VALUE = 2000;
+    private final int LEFT_WALL_PRESENT_SONAR_VALUE = 2000;
     private final int CORRECTION_EQUILIBRIUM = 836;
 
     public Commander(IOIO ioio, IRobotCreateInterface create, Dashboard dashboard) throws ConnectionLostException {
@@ -58,17 +59,17 @@ public class Commander extends IRobotCreateAdapter {
             SystemClock.sleep(1000);
             return;
         }
-        //try {
-        //scenarios();
-        readPrintUltraSonic();
-        //driveUntilBump();
-        //driveCorrection();
-        if (isBumping()) {
-            driveDirect(0, 0);
+        try {
+            //scenarios();
+            //readPrintUltraSonic();
+            //driveUntilBump();
+            driveCorrection();
+            if (isBumping()) {
+                driveDirect(0, 0);
+            }
+        } catch (InterruptedException ex) {
+            dashboard.log("InterruptedException Error");
         }
-        //} catch (InterruptedException ex) {
-        //    dashboard.log("InterruptedException Error");
-        //}
         SystemClock.sleep(1000);
     }
 
@@ -267,12 +268,12 @@ public class Commander extends IRobotCreateAdapter {
             if (leftSonarValue > rightSonarValue) {
 
                 dashboard.log("Speed up the right wheel.");
-                drive(FORWARD, STANDARD_SPEED, INCREASED_SPEED);
+                drive(FORWARD, STANDARD_SPEED, RIGHT_INCREASED_SPEED);
 
             } else if (leftSonarValue < rightSonarValue) {
 
                 dashboard.log("Speed up the left wheel.");
-                drive(FORWARD, INCREASED_SPEED, STANDARD_SPEED);
+                drive(FORWARD, LEFT_INCREASED_SPEED, STANDARD_SPEED);
 
             } else {
 
@@ -285,15 +286,15 @@ public class Commander extends IRobotCreateAdapter {
             dashboard.log("------------------------------------");
 
 
-            if (leftSonarValue < CORRECTION_EQUILIBRIUM) {
+            if (leftSonarValue > CORRECTION_EQUILIBRIUM) {
 
                 dashboard.log("Speed up the right wheel.");
-                drive(FORWARD, STANDARD_SPEED, INCREASED_SPEED);
+                drive(FORWARD, STANDARD_SPEED, RIGHT_INCREASED_SPEED);
 
             } else {
 
                 dashboard.log("Speed up the left wheel.");
-                drive(FORWARD, INCREASED_SPEED, STANDARD_SPEED);
+                drive(FORWARD, LEFT_INCREASED_SPEED, STANDARD_SPEED);
             }
 
         } else if (isRightWallThere(rightSonarValue)) {
@@ -301,15 +302,15 @@ public class Commander extends IRobotCreateAdapter {
             dashboard.log("Center the robot using the right wall.");
             dashboard.log("------------------------------------");
 
-            if (rightSonarValue < CORRECTION_EQUILIBRIUM) {
+            if (rightSonarValue > CORRECTION_EQUILIBRIUM) {
 
                 dashboard.log("Speed up the left wheel.");
-                drive(FORWARD, INCREASED_SPEED, STANDARD_SPEED);
+                drive(FORWARD, LEFT_INCREASED_SPEED, STANDARD_SPEED);
 
             } else {
 
                 dashboard.log("Speed up the right wheel.");
-                drive(FORWARD, STANDARD_SPEED, INCREASED_SPEED);
+                drive(FORWARD, STANDARD_SPEED, RIGHT_INCREASED_SPEED);
             }
         } else {
 
