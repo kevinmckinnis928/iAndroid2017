@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.wintrisstech.irobot.ioio.IRobotCreateAdapter;
 import org.wintrisstech.irobot.ioio.IRobotCreateInterface;
+import org.wintrisstech.irobot.ioio.IRobotCreateScript;
 import org.wintrisstech.sensors.UltraSonicSensors;
 
 public class Commander extends IRobotCreateAdapter {
@@ -47,6 +48,7 @@ public class Commander extends IRobotCreateAdapter {
         readSensors(SENSORS_GROUP_ID6);//Resets all counters in the Create to 0.
         dashboard.log("Battery Voltage" + getVoltage());//reads the voltage of the Robot
         dashboard.log("-----------------------------------");
+        turnUsingScript(RIGHT);
     }
 
     /**
@@ -59,18 +61,18 @@ public class Commander extends IRobotCreateAdapter {
             SystemClock.sleep(1000);
             return;
         }
-        try {
-            //scenarios();
-            //readPrintUltraSonic();
-            //driveUntilBump();
-            driveCorrection();
-            if (isBumping()) {
-                driveDirect(0, 0);
-            }
-        } catch (InterruptedException ex) {
-            dashboard.log("InterruptedException Error");
-        }
-        SystemClock.sleep(1000);
+        //SystemClock.sleep(1000);
+        //try {
+        //scenarios();
+        // readPrintUltraSonic();
+        //driveUntilBump();
+        // if (isBumping()) {
+        //     driveDirect(0, 0);
+        // }
+        // } catch (InterruptedException ex) {
+        //   dashboard.log("InterruptedException Error");
+        //}
+       // SystemClock.sleep(1000);
     }
 
     private void readPrintUltraSonic() {
@@ -150,10 +152,27 @@ public class Commander extends IRobotCreateAdapter {
         dashboard.log("angleToTurn: " + angleToTurn);
         while (angleSoFar < angleToTurn) {
             readSensors(SENSORS_ANGLE);
-            angleSoFar = Math.abs(getAngle());
+            angleSoFar += Math.abs(getAngle());
             dashboard.log("angleSoFar: " + angleSoFar);
         }
         stop();
+    }
+
+    public void turnUsingScript(int direction) throws ConnectionLostException {
+        IRobotCreateScript turnUsingScript = new IRobotCreateScript();
+        if (direction == RIGHT) {
+            turnUsingScript.turnInPlace(100, true);
+            turnUsingScript.waitAngle(-90);
+            turnUsingScript.drive(0, 0);
+        } else if (direction == LEFT) {
+            turnUsingScript.turnInPlace(100, false);
+            turnUsingScript.waitAngle(90);
+            turnUsingScript.drive(0, 0);
+        }
+        byte[] script = turnUsingScript.getBytes();
+        dashboard.log("Should stop now");
+        playScript(script, false);
+
     }
 
     private void drive(int direction) throws ConnectionLostException {
@@ -221,7 +240,11 @@ public class Commander extends IRobotCreateAdapter {
         while (distanceDriven < distance) {
             readSensors(SENSORS_DISTANCE);
             distanceDriven += getDistance();
-            driveDirect(speed, speed);
+            try {
+                driveCorrection();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Commander.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }
@@ -317,6 +340,7 @@ public class Commander extends IRobotCreateAdapter {
             dashboard.log("No data to center the robot.");
             dashboard.log("------------------------------------");
         }
+        SystemClock.sleep(1000);
     }
 
     private boolean isRightWallThere(int sonarValue) {
