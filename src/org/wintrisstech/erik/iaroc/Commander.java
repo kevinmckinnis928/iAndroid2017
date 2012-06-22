@@ -45,7 +45,6 @@ public class Commander extends IRobotCreateAdapter {
     public void initialize() throws ConnectionLostException {
 
         dashboard.log("===========Initialize===========");
-        SystemClock.sleep(1000);
         readSensors(SENSORS_GROUP_ID6);//Resets all counters in the Create to 0.
         dashboard.log("Battery Voltage" + getVoltage());//reads the voltage of the Robot
         dashboard.log("-----------------------------------");
@@ -58,22 +57,10 @@ public class Commander extends IRobotCreateAdapter {
      */
     public void loop() throws ConnectionLostException {
 
+        //goldRush();
         //bumpLeft();
         //bumpRight();
-        //dragRace();
-        /**
-         * SystemClock.sleep(1000);
-         *
-         * readPrintUltraSonic();
-         *
-         * SystemClock.sleep(1000);
-         *
-         * readPrintUltraSonic();
-         *
-         * scenarios();
-         *
-         * if (isBumping()) { driveDirect(0, 0); } SystemClock.sleep(1000);
-         */
+        dragRace();
     }
 
     private void readPrintUltraSonic() {
@@ -254,8 +241,7 @@ public class Commander extends IRobotCreateAdapter {
     private void driveUntilBump() throws ConnectionLostException {
 
         while (!isBumping()) {
-            driveDirect(STANDARD_SPEED, STANDARD_SPEED);
-            logDistance();
+            driveDirect(500, 500);
         }
         stop();
         done = true;
@@ -413,14 +399,14 @@ public class Commander extends IRobotCreateAdapter {
         readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
         if ((isBumpLeft()) || (isBumpLeft() && isBumpRight())) {
             driveDirect(-500, -500);
-            SystemClock.sleep(50);
+            SystemClock.sleep(100);
             turnUsingScript(RIGHT, 25);
         } else if ((isBumpRight()) || (isBumpRight() && isBumpLeft())) {
             driveDirect(-500, -500);
-            SystemClock.sleep(50);
+            SystemClock.sleep(100);
             turnUsingScript(LEFT, 25);
         } else {
-            driveDirect(500, 500);
+            driveDirect(470, 500);
         }
 
     }
@@ -428,15 +414,18 @@ public class Commander extends IRobotCreateAdapter {
     public void goldRush() throws ConnectionLostException {
 
         if ((isBumpLeft()) || (isBumpLeft() && isBumpRight())) {
-            driveDirect(-500, -500);
+            driveDirect(-500, -200);
             SystemClock.sleep(50);
             turnUsingScript(RIGHT, 25);
         } else if ((isBumpRight()) || (isBumpRight() && isBumpLeft())) {
-            driveDirect(-500, -500);
+            driveDirect(-200, -500);
             SystemClock.sleep(50);
             turnUsingScript(LEFT, 25);
         } else {
-            driveDirect(500, 500);
+            driveDirect(500, 200);
+            SystemClock.sleep(1000);
+            printBeaconState();
+            circleScan();
         }
 
     }
@@ -451,5 +440,38 @@ public class Commander extends IRobotCreateAdapter {
         dashboard.log("Forcefield present" +  beaconState.isForcefield());
         dashboard.log("--------------------------------------------");
         SystemClock.sleep(1000);
+    }
+    public void circleScan() throws ConnectionLostException
+    {
+        for (int i = 0; i < 36; i++) {
+            readSensors(SENSORS_INFRARED_BYTE);
+            byte iRbyte = (byte) getInfraredByte();
+            BeaconState beaconState = iRSensorUtilities.getBeaconState(iRbyte);
+            turnUsingScript(RIGHT, 8);
+            if(beaconState.isRedBuoy() == false)
+            {
+                driveUntilBump();
+                SystemClock.sleep(500);
+                return;
+            }
+            else if(beaconState.isGreenBuoy() == false)
+            {
+                driveUntilBump();
+                SystemClock.sleep(500);
+                return;
+            }
+            else if(beaconState.isForcefield() == false)
+            {
+                turnUsingScript(LEFT, 60);
+                while(beaconState.isRedBuoy() == true || beaconState.isGreenBuoy() == true)
+                {
+                    bumpLeft();
+                }
+                turnUsingScript(RIGHT, 60);
+                driveUntilBump();
+                SystemClock.sleep(1500);
+                return;
+            }
+        }
     }
 }
