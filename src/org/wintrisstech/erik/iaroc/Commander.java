@@ -387,11 +387,11 @@ public class Commander extends IRobotCreateAdapter {
 
         readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
         if ((isBumpLeft()) || (isBumpLeft() && isBumpRight())) {
-            driveDirect(-500, -150);
+            driveDirect(-500, -200);
             SystemClock.sleep(100);
             turnUsingScript(RIGHT, 45);
         } else {
-            driveDirect(500, 150);
+            driveDirect(500, 200);
         }
     }
 
@@ -399,11 +399,11 @@ public class Commander extends IRobotCreateAdapter {
 
         readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
         if ((isBumpRight()) || (isBumpLeft() && isBumpRight())) {
-            driveDirect(-150, -500);
-            SystemClock.sleep(100);
+            driveDirect(-200, -500);
+            SystemClock.sleep(50);
             turnUsingScript(RIGHT, 45);
         } else {
-            driveDirect(150, 500);
+            driveDirect(200, 500);
         }
     }
 
