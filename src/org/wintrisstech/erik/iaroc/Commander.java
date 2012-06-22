@@ -151,15 +151,15 @@ public class Commander extends IRobotCreateAdapter {
     public void turnUsingScript(int direction, int AngleToTurn) throws ConnectionLostException {
         IRobotCreateScript turnUsingScript = new IRobotCreateScript();
         if (direction == RIGHT) {
-            turnUsingScript.turnInPlace(100, true);
+            turnUsingScript.turnInPlace(500, true);
             turnUsingScript.waitAngle(-AngleToTurn);
             turnUsingScript.drive(0, 0);
         } else if (direction == LEFT) {
-            turnUsingScript.turnInPlace(100, false);
+            turnUsingScript.turnInPlace(500, false);
             turnUsingScript.waitAngle(AngleToTurn);
             turnUsingScript.drive(0, 0);
         } else if (direction == BACKWARD) {
-            turnUsingScript.turnInPlace(100, false);
+            turnUsingScript.turnInPlace(500, false);
             turnUsingScript.waitAngle(AngleToTurn);
             turnUsingScript.drive(0, 0);
         }
@@ -384,12 +384,24 @@ public class Commander extends IRobotCreateAdapter {
         
         readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
         if ((isBumpLeft()) || (isBumpLeft() && isBumpRight()))  {
-            driveDirect(-500, -500);
-            //SystemClock.sleep(50);
-            turnUsingScript(RIGHT, 25);
+            driveDirect(-500, -150);
+            SystemClock.sleep(100);
+            turnUsingScript(RIGHT, 45);
             bumpLeft();
         } else {
-            driveDirect(500, 200);
+            driveDirect(500, 150);
+        }
+    }
+      public void bumpRight() throws ConnectionLostException {
+        
+        readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
+        if ((isBumpRight()) || (isBumpLeft() && isBumpRight()))  {
+            driveDirect(-150, -500);
+            SystemClock.sleep(100);
+            turnUsingScript(RIGHT, 45);
+            bumpLeft();
+        } else {
+            driveDirect(150, 500);
         }
     }
 }
