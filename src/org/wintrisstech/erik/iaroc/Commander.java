@@ -45,6 +45,7 @@ public class Commander extends IRobotCreateAdapter {
     public void initialize() throws ConnectionLostException {
 
         dashboard.log("===========Initialize===========");
+        SystemClock.sleep(1000);
         readSensors(SENSORS_GROUP_ID6);//Resets all counters in the Create to 0.
         dashboard.log("Battery Voltage" + getVoltage());//reads the voltage of the Robot
         dashboard.log("-----------------------------------");
@@ -57,7 +58,7 @@ public class Commander extends IRobotCreateAdapter {
      */
     public void loop() throws ConnectionLostException {
 
-        bumpLeft();
+        //bumpLeft();
         //bumpRight();
         //dragRace();
         /**
