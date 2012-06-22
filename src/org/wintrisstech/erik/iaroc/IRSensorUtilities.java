@@ -10,15 +10,16 @@ package org.wintrisstech.erik.iaroc;
  */
 public class IRSensorUtilities
 {
-    public BeaconState getBeaconState(int infraredByte)
+   
+    public BeaconState getBeaconState(byte infraredByte)
     {
         BeaconState beaconstate = new BeaconState();
-        int redBuoyMask = 0x8;
-        int redBuoyResult = infraredByte & redBuoyMask;
-        int greenBuoyMask = 0x4;
-        int greenBuoyResult = infraredByte & greenBuoyMask; 
-        int forcefieldMask = 0x2;
-        int forcefieldResult = infraredByte & forcefieldMask; 
+        byte redBuoyMask = 0x8;
+        byte redBuoyResult = (byte) (infraredByte & redBuoyMask);
+        byte greenBuoyMask = 0x4;
+        byte greenBuoyResult = (byte) (infraredByte & greenBuoyMask); 
+        byte forcefieldMask = 0x2;
+        byte forcefieldResult = (byte) (infraredByte & forcefieldMask); 
         if(redBuoyResult == 0x8)
         {
             beaconstate.setRedBuoy(true);
